@@ -37,3 +37,46 @@ Frontend: HTML, CSS, Bootstrap
 Template Engine: Jinja2
 
 Form Handling & File Upload: Flask-WTF / Flask request.form & request.files
+
+Cara Menjalankan Aplikasi
+
+Clone repository:
+
+git clone <link-repo-anda>
+cd <nama-folder-project>
+
+
+Buat virtual environment dan install dependencies:
+
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+pip install -r requirements.txt
+
+
+Import database:
+
+# jika menggunakan SQLite, biasanya file sudah termasuk
+# jika MySQL/PostgreSQL, gunakan file export .sql
+
+
+Jalankan server Flask:
+
+flask run
+
+
+Buka browser:
+
+http://127.0.0.1:5000
+
+Struktur Project
+project-folder/
+│
+├─ app.py / myapp.py       # file utama Flask
+├─ templates/              # folder HTML template
+├─ static/                 # folder CSS, JS, images
+├─ database.db             # SQLite database (atau .sql export)
+├─ requirements.txt        # daftar library Python
+└─ README.md               # dokumentasi project
+
+
