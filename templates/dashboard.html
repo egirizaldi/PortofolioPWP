@@ -1,0 +1,391 @@
+{% extends 'layout.html' %} {% block head %}
+<title>Halaman Dashboard</title>
+<style>
+  /* Tambahkan sedikit style jika perlu */
+</style>
+{% endblock %} {% block body %}
+<div class="container mt-5" style="margin-left: 10rem;">
+  <a href="{{url_for('logout')}}">
+    <button type="button" class="btn btn-outline-primary" style="margin-left: 28rem; margin-top: 5px">Logout</button>
+  </a>
+</div>
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Edit About Me</h2>
+
+  <form id="updateAboutForm" action="/api/bio" method="POST" enctype="multipart/form-data" class="border p-4 rounded shadow">
+    <div class="mb-3">
+      <label class="form-label">Nama</label>
+      <input type="text" class="form-control" name="name" value="{{ user[3] }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Bio / Deskripsi Singkat</label>
+      <textarea class="form-control" name="bio" rows="4" required>{{ user[4] }}</textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Foto (Opsional)</label>
+      <input type="file" class="form-control" name="photo" />
+    </div>
+
+    {% if user[5] %}
+    <p>Foto saat ini:</p>
+    <img src="{{ url_for('static', filename='upload/' ~ user[5]) }}" width="100" style="object-fit: cover" />
+    {% endif %}
+
+    <button type="submit" class="btn btn-success w-100 mt-3">Simpan Perubahan</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById("updateAboutForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    fetch(this.action, {
+      method: "POST",
+      body: new FormData(this),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        alert(data.message);
+        location.reload();
+      })
+      .catch((err) => {
+        alert("Error: " + err);
+      });
+  });
+</script>
+
+<!-- End dashboard User -->
+<!-- Start Dashboard Skill -->
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Dashboard Skill</h2>
+
+  <form id="addSkillForm" action="/api/skills" method="POST" enctype="multipart/form-data" class="mb-4 border p-3 rounded shadow-sm">
+    <h5 class="mb-3">Tambah Skill Baru</h5>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <input type="text" class="form-control" name="name" placeholder="Nama Skill" required />
+      </div>
+      <div class="col-md-4">
+        <input type="text" class="form-control" name="level" placeholder="Level (Beginner/Intermediate/Expert)" required />
+      </div>
+      <div class="col-md-3">
+        <input type="file" class="form-control" name="icon" required />
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Tambah</button>
+      </div>
+    </div>
+  </form>
+
+  <table class="table table-bordered text-center align-middle mt-5">
+    <thead class="table-dark">
+      <tr>
+        <th>Icon</th>
+        <th>Nama Skill</th>
+        <th>Level</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for skill in skills %}
+      <tr>
+        <td><img src="{{ url_for('static', filename='upload/' ~ skill[3]) }}" width="70" height="70" style="object-fit: contain" alt="{{ skill[1] }} icon" /></td>
+        <td>{{ skill[1] }}</td>
+        <td>{{ skill[2] }}</td>
+        <td>
+          <button class="btn btn-warning btn-sm" onclick="openEditModal('{{ skill[0] }}', '{{ skill[1] }}', '{{ skill[2] }}')">Edit</button>
+          <button onclick="deleteSkill('{{ skill[0] }}')" class="btn btn-danger btn-sm">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Skill</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" onsubmit="event.preventDefault(); updateSkill();">
+          <input type="hidden" id="editId" name="id" />
+          <div class="mb-3">
+            <label for="editName" class="form-label">Nama Skill</label>
+            <input type="text" class="form-control" id="editName" name="name" required />
+          </div>
+          <div class="mb-3">
+            <label for="editLevel" class="form-label">Level</label>
+            <input type="text" class="form-control" id="editLevel" name="level" required />
+          </div>
+          <div class="mb-3">
+            <label for="editIcon" class="form-label">Ganti Icon (Opsional)</label>
+            <input type="file" class="form-control" id="editIcon" name="icon" />
+          </div>
+          <button type="submit" class="btn btn-success w-100">Simpan Perubahan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // Fungsi Delete
+  function deleteSkill(id) {
+    if (confirm("Yakin ingin menghapus skill ini?")) {
+      fetch(`/api/skills/${id}`, { method: "DELETE" })
+        .then((response) => response.json())
+        .then((data) => {
+          alert(data.message);
+          location.reload();
+        })
+        .catch((error) => alert("Terjadi error saat menghapus: " + error));
+    }
+  }
+
+  // Fungsi Buka Modal Edit
+  function openEditModal(id, name, level) {
+    document.getElementById("editId").value = id;
+    document.getElementById("editName").value = name;
+    document.getElementById("editLevel").value = level;
+    // Memanggil modal menggunakan Bootstrap 5 JS
+    const editModal = new bootstrap.Modal(document.getElementById("editModal"));
+    editModal.show();
+  }
+
+  // Fungsi Update (Menggunakan PUT)
+  function updateSkill() {
+    const id = document.getElementById("editId").value;
+    const formData = new FormData();
+    formData.append("name", document.getElementById("editName").value);
+    formData.append("level", document.getElementById("editLevel").value);
+    const icon = document.getElementById("editIcon").files[0];
+    if (icon) formData.append("icon", icon);
+
+    fetch(`/api/skills/${id}`, {
+      method: "PUT",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((err) => {
+            throw new Error(err.Error || "Update gagal.");
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert(data.message);
+        location.reload();
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      });
+  }
+
+  // Fungsi Tambah Skill (Menggunakan POST)
+  document.getElementById("addSkillForm").addEventListener("submit", function (e) {
+    e.preventDefault(); // Mencegah form submit default
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          // Tangani error dari Flask (misalnya Error 400 jika field kosong/format salah)
+          return response.json().then((err) => {
+            throw new Error(err.Error || "Penambahan gagal.");
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert(data.message);
+        location.reload(); // Refresh halaman untuk melihat data baru
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      });
+  });
+</script>
+<!-- End Dashboard Skills -->
+
+<!-- Start Dashboard Projects -->
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Dashboard Projects</h2>
+
+  <form id="addProjectForm" action="/api/projects" method="POST" enctype="multipart/form-data" class="mb-4 border p-3 rounded shadow-sm">
+    <h5 class="mb-3">Tambah Project Baru</h5>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <input type="text" class="form-control" name="title" placeholder="Nama project" required />
+      </div>
+      <div class="col-md-4">
+        <input type="text" class="form-control" name="description" placeholder="Sub Heading" required />
+      </div>
+      <div class="col-md-3">
+        <input type="file" class="form-control" name="image" required />
+      </div>
+      <div class="col-md-4">
+        <input type="text" class="form-control" name="link" placeholder="Paste Link" required />
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Tambah</button>
+      </div>
+    </div>
+  </form>
+
+  <table class="table table-bordered text-center align-middle mt-5">
+    <thead class="table-dark">
+      <tr>
+        <th>image</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Link</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project in projects %}
+      <tr>
+        <td><img src="{{ url_for('static', filename='upload/' ~ project[3]) }}" width="70" height="70" style="object-fit: contain" alt="{{ project[1] }} image" /></td>
+        <td>{{ project[1] }}</td>
+        <td style="font-size: small">{{ project[2] }}</td>
+        <td style="font-size: small">{{ project[4] }}</td>
+        <td>
+          <button class="btn btn-warning btn-sm" onclick="openProjectEditModal('{{ project[0] }}', '{{ project[1] }}', '{{ project[2] }}', '{{ project[4] }}')">Edit</button>
+          <button onclick="deleteproject('{{ project[0] }}')" class="btn btn-danger btn-sm">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="editProjectModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Project</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editProjectForm" onsubmit="event.preventDefault(); updateProject();">
+          <input type="hidden" id="editProjectId" name="id" />
+          <div class="mb-3">
+            <label for="editTitle" class="form-label">Nama Project</label>
+            <input type="text" class="form-control" id="editTitle" name="title" required />
+          </div>
+          <div class="mb-3">
+            <label for="editDescription" class="form-label">Description</label>
+            <input type="text" class="form-control" id="editDescription" name="description" required />
+          </div>
+          <div class="mb-3">
+            <label for="editImage" class="form-label">Ganti Image (Opsional)</label>
+            <input type="file" class="form-control" id="editImage" name="image" />
+          </div>
+          <div class="mb-3">
+            <label for="editLink" class="form-label">Link</label>
+            <input type="text" class="form-control" id="editLink" name="link" required />
+          </div>
+          <button type="submit" class="btn btn-success w-100">Simpan Perubahan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Fungsi Delete
+  function deleteproject(id) {
+    if (confirm("Yakin ingin menghapus Project ini?")) {
+      fetch(`/api/projects/${id}`, { method: "DELETE" })
+        .then((response) => response.json())
+        .then((data) => {
+          alert(data.message);
+          location.reload();
+        })
+        .catch((error) => alert("Terjadi error saat menghapus: " + error));
+    }
+  }
+
+  // Fungsi Buka Modal Edit
+  function openProjectEditModal(id, title, description, link) {
+    document.getElementById("editProjectId").value = id;
+    document.getElementById("editTitle").value = title;
+    document.getElementById("editDescription").value = description;
+    document.getElementById("editLink").value = link;
+    // Memanggil modal menggunakan Bootstrap 5 JS
+    const editProjectModal = new bootstrap.Modal(document.getElementById("editProjectModal"));
+    editProjectModal.show();
+  }
+
+  // Fungsi Update (Menggunakan PUT)
+  function updateProject() {
+    const id = document.getElementById("editProjectId").value;
+    const formData = new FormData();
+    formData.append("title", document.getElementById("editTitle").value);
+    formData.append("description", document.getElementById("editDescription").value);
+    const image = document.getElementById("editImage").files[0];
+    formData.append("link", document.getElementById("editLink").value);
+    if (image) formData.append("image", image);
+
+    fetch(`/api/projects/${id}`, {
+      method: "PUT",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((err) => {
+            throw new Error(err.Error || "Update gagal.");
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert(data.message);
+        location.reload();
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      });
+  }
+
+  // Fungsi Tambah Project (Menggunakan POST)
+  document.getElementById("addProjectForm").addEventListener("submit", function (e) {
+    e.preventDefault(); // Mencegah form submit default
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          // Tangani error dari Flask (misalnya Error 400 jika field kosong/format salah)
+          return response.json().then((err) => {
+            throw new Error(err.Error || "Penambahan gagal.");
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        alert(data.message);
+        location.reload(); // Refresh halaman untuk melihat data baru
+      })
+      .catch((error) => {
+        alert("Error: " + error.message);
+      });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+/* Start Navbar Menu */
+body {
+  height: 2000px;
+  background: url('/static/img/bg.jpg') no-repeat center center fixed !important;
+  background-size: cover !important;
+
+}
+
+.navbar-brand {
+  font-size: 19px;
+  font-weight: 500;
+  margin-left: 5rem;
+}
+
+.navbar-nav {
+  font-size: 19px;
+  font-weight: 500;
+}
+
+section {
+  margin-top: 75px;
+}
+.container-flex {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* End Navbar Menu */
+/* Start Hero Section */
+.container-flex .About-me {
+  width: 50%;
+  padding-right: 100px;
+  margin-left: 150px;
+  margin-top: 30px;
+}
+.container-flex .image-foto-profile {
+  width: 50%;
+  position: relative;
+}
+
+.container-flex .image-foto-profile img {
+  width: 50%;
+  height: 100%;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 20px;
+}
+/* End Hero Section */
+
+/* Start Skill section */
+.Skill-section div h1 {
+  display: flex;
+  justify-content: center;
+}
