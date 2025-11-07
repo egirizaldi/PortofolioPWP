@@ -80,13 +80,13 @@ project-folder/
 └─ README.md               # dokumentasi project
 
 Screenshoot
-![Deskripsi Gambar](https://Screenshot/1.jpg)
-![Deskripsi Gambar](https://Screenshot/2.jpg)
-![Deskripsi Gambar](https://Screenshot/3.jpg)
-![Deskripsi Gambar](https://Screenshot/4.jpg)
-![Deskripsi Gambar](https://Screenshot/5(1).jpg)
-![Deskripsi Gambar](https://Screenshot/5(2).jpg)
-![Deskripsi Gambar](https://Screenshot/5(3).jpg)
+![Deskripsi Gambar](https://Screenshot/1.png)
+![Deskripsi Gambar](https://Screenshot/2.png)
+![Deskripsi Gambar](https://Screenshot/3.png)
+![Deskripsi Gambar](https://Screenshot/4.png)
+![Deskripsi Gambar](https://Screenshot/5(1).png)
+![Deskripsi Gambar](https://Screenshot/5(3).png)
+![Deskripsi Gambar](https://Screenshot/6.png)
 
 
 
